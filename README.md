@@ -16,51 +16,52 @@ $ open https://cmake.org/
 ## Tutorial
 
 ```ShellSession
-$ export GITHUB_USERNAME=<имя_пользователя>
+$ export GITHUB_USERNAME=VladislavSchastnyi
 ```
 
 ```ShellSession
-$ cd ${GITHUB_USERNAME}/workspace
-$ pushd .
-$ source scripts/activate
+$ cd ${GITHUB_USERNAME}/workspace # переход в директорию
+$ pushd . #сохранение имя текущего каталога для команды popd
+~/workspace/VladislavSchastnyi/workspace ~/workspace/VladislavSchastnyi/workspace
+$ source scripts/activate  #выполнение команд из файла
 ```
 
-```ShellSession
-$ git clone https://github.com/${GITHUB_USERNAME}/lab03.git projects/lab04
+```ShellSession 
+$ git clone https://github.com/${GITHUB_USERNAME}/lab03.git projects/lab04 #получение копии
 Cloning into 'projects/lab04'...
 remote: Counting objects: 19, done.
 remote: Compressing objects: 100% (13/13), done.
 remote: Total 19 (delta 1), reused 13 (delta 0), pack-reused 0
 Unpacking objects: 100% (19/19), done.
-$ cd projects/lab04
-$ git remote remove origin
-$ git remote add origin https://github.com/${GITHUB_USERNAME}/lab04.git
+$ cd projects/lab04 #переход в папку
+$ git remote remove origin #удаление доступа к предыдущему удаленному репозиторию
+$ git remote add origin https://github.com/${GITHUB_USERNAME}/lab04.git #добавление нового удаленного репозитория
 ```
 
 ```ShellSession
-$ g++ -I./include -std=c++11 -c sources/print.cpp
-$ ls print.o
+$ g++ -I./include -std=c++11 -c sources/print.cpp #компиляция файла
+$ ls print.o #содержание файла с объектным кодом
 print.o
-$ nm print.o | grep print
+$ nm print.o | grep print #строки объектного файла, содержащие print
 0000000000000087 t _GLOBAL__sub_I__Z5printRKSsRSo
 0000000000000000 T _Z5printRKSsRSo
 0000000000000025 T _Z5printRKSsRSt14basic_ofstreamIcSt11char_traitsIcEE
-$ ar rvs print.a print.o
+$ ar rvs print.a print.o #архивация файла
 ar: creating print.a
 a - print.o
-$ file print.a
+$ file print.a # определяем тип файла
 print.a: current ar archive
-$ g++ -I./include -std=c++11 -c examples/example1.cpp
-$ ls example1.o
+$ g++ -I./include -std=c++11 -c examples/example1.cpp #компиляция файла
+$ ls example1.o #содержание файла с кодом
 example1.o
-$ g++ example1.o print.a -o example1
-$ ./example1 && echo
+$ g++ example1.o print.a -o example1 #компиляция файла с функцией main и заархивированный ранее файл  
+$ ./example1 && echo #запуск скомпилированного файла
 hello
 ```
 
 ```ShellSession
-$ g++ -I./include -std=c++11 -c examples/example2.cpp
-$ nm example2.o
+$ g++ -I./include -std=c++11 -c examples/example2.cpp #компиляция второго файла с функцией main
+$ nm example2.o #бинарное содержимое файла
 000000000000015f t _GLOBAL__sub_I_main
                  U _Unwind_Resume
 0000000000000122 t _Z41__static_initialization_and_destruction_0ii
@@ -83,47 +84,48 @@ $ nm example2.o
                  w __pthread_key_create
                  U __stack_chk_fail
 0000000000000000 T main
-$ g++ example2.o print.a -o example2
-$ ./example2
-$ cat log.txt && echo
+$ g++ example2.o print.a -o example2 #компиляция файла и архива
+$ ./example2 #запуск
+$ cat log.txt && echo #вывод содержимого файла
 hello
 ```
 
 ```ShellSession
-$ rm -rf example1.o example2.o print.o 
-$ rm -rf print.a 
-$ rm -rf example1 example2
-$ rm -rf log.txt
+$ rm -rf example1.o example2.o print.o #удаление файлов объектного кода
+$ rm -rf print.a #удаление архива
+$ rm -rf example1 example2 #удаление скомпилированных файлов
+$ rm -rf log.txt #удаление текстового файла
 ```
 
-```ShellSession
-$ cat > CMakeLists.txt <<EOF
+```ShellSession 
+$ cat > CMakeLists.txt <<EOF #запись в файл
 cmake_minimum_required(VERSION 2.8)
 project(print)
 EOF
 ```
 
 ```ShellSession
-$ cat >> CMakeLists.txt <<EOF
+$ cat >> CMakeLists.txt <<EOF #запись в файл
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 EOF
 ```
 
 ```ShellSession
-$ cat >> CMakeLists.txt <<EOF
+$ cat >> CMakeLists.txt <<EOF #запись в файл
 add_library(print STATIC \${CMAKE_CURRENT_SOURCE_DIR}/sources/print.cpp)
 EOF
 ```
 
 ```ShellSession
-$ cat >> CMakeLists.txt <<EOF
+$ cat >> CMakeLists.txt <<EOF #запись в файл
 include_directories(\${CMAKE_CURRENT_SOURCE_DIR}/include)
 EOF
 ```
+Сборка проекта
 
 ```ShellSession
-$ cmake -H. -B_build
+$ cmake -H. -B_build 
 -- The C compiler identification is Clang 3.6.0
 -- The CXX compiler identification is GNU 4.8.4
 -- Check for working C compiler: /usr/bin/clang
@@ -145,7 +147,7 @@ Linking CXX static library libprint.a
 ```
 
 ```ShellSession
-$ cat >> CMakeLists.txt <<EOF
+$ cat >> CMakeLists.txt <<EOF #запись в файл
 
 add_executable(example1 \${CMAKE_CURRENT_SOURCE_DIR}/examples/example1.cpp)
 add_executable(example2 \${CMAKE_CURRENT_SOURCE_DIR}/examples/example2.cpp)
@@ -153,12 +155,14 @@ EOF
 ```
 
 ```ShellSession
-$ cat >> CMakeLists.txt <<EOF
-
+$ cat >> CMakeLists.txt <<EOF #запись в файл
+ 
 target_link_libraries(example1 print)
 target_link_libraries(example2 print)
 EOF
 ```
+
+Сборка проектов
 
 ```ShellSession
 $ cmake --build _build
@@ -184,6 +188,8 @@ $ cmake --build _build --target example2
 [100%] Built target example2
 ```
 
+Проверка работы примеров
+
 ```ShellSession
 $ ls -la _build/libprint.a
 -rw------- 1 ubuntu ubuntu 2746 Jun  7 22:09 _build/libprint.a
@@ -196,14 +202,16 @@ $ rm -rf log.txt
 ```
 
 ```ShellSession
-$ git clone https://github.com/tp-labs/lab04 tmp
+$ git clone https://github.com/tp-labs/lab04 tmp # клонируем репозиторий
 Cloning into 'tmp'...
 remote: Counting objects: 37, done.
 remote: Total 37 (delta 0), reused 0 (delta 0), pack-reused 37
 Unpacking objects: 100% (37/37), done.
-$ mv -f tmp/CMakeLists.txt .
-$ rm -rf tmp
+$ mv -f tmp/CMakeLists.txt .  # перемещаем файл в текущую директорию
+$ rm -rf tmp # удаляем клонированную ранее директорию
 ```
+
+Просматриваем файл CMakeLists, собираем проект, отображаем проект в виде дерева
 
 ```ShellSession
 $ cat CMakeLists.txt
@@ -270,12 +278,12 @@ _install
 ```
 
 ```ShellSession
-$ git add CMakeLists.txt
-$ git commit -m"added CMakeLists.txt"
+$ git add CMakeLists.txt #запись содержимого файла
+$ git commit -m"added CMakeLists.txt" #коммит
 [master 571270a] added CMakeLists.txt
  1 file changed, 36 insertions(+)
  create mode 100644 CMakeLists.txt
-$ git push origin master
+$ git push origin master # отправка на сервер
 Counting objects: 25, done.
 Delta compression using up to 8 threads.
 Compressing objects: 100% (19/19), done.
